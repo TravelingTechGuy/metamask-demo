@@ -7,7 +7,7 @@ function App() {
   const [account, setAccount] = useState(undefined);
   const [network, setNetwork] = useState(undefined);
   const [error, setError] = useState('');
-  const {ethereum} = window;  //will be empty if now web3 wallet injected
+  const {ethereum} = window;  //will be empty if no web3 wallet is injected by the browser
   const web3 = ethereum ? new Web3(ethereum) : undefined;
 
   //initiates connection with web3 wallet
@@ -26,14 +26,13 @@ function App() {
 
   //converts chainId to network name, using the JSON from chainId.network
   const setNetworkName = chainId => {
-    chainId = parseInt(chainId, 16);
+    chainId = parseInt(chainId, 16);  //chainId are hexadecimal, while the JSON list is in decimal
     console.log(`connected to chainID ${chainId}`);
     let chain = Chains.find(c => c.chainId === chainId);
-    setNetwork(chain ? chain.name : 'unknown');
+    setNetwork(chain?.name || `private (chain ID: ${chainId})`);
   };
 
   useEffect(() => {
-    const {ethereum} = window;
     //if there's a wallet
     if(web3) {
       getAccount();
@@ -45,6 +44,7 @@ function App() {
       console.error('no wallet installed!');
       setError('Please install a web3 wallet (like Metamask) and refresh the page');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
